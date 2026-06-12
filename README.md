@@ -32,6 +32,7 @@ from looking better than it is.
 | # | file | tests | status |
 |---|------|-------|--------|
 | 01 | `benchmarks/forgetting_spacing.py` | Ebbinghaus forgetting curve + spacing effect | **run** — see finding below |
+| 02 | `benchmarks/hsam_rehearsal.py` | HSAM: age-independent recall via rehearsal | **run** — M2-only, see finding below |
 
 ### Benchmark 01 finding (2026-06-11)
 
@@ -65,6 +66,29 @@ curve. The benchmark located a real, confirmed gap in the artifact.
 > brain-like and failed." The claim is narrower: the documented rule
 > ("persistence is a function of corroboration") is, in code, literally a function
 > of corroboration *count*, and that rule does not reproduce these phenomena.
+
+### Benchmark 02 finding (2026-06-11)
+
+Motivated by the 60 Minutes "Endless Memory" segment on HSAM (people who recall
+essentially every day of their life, *age-independently*). The claim under test:
+HSAM is not special storage — it is the behavioral limit of **M2 + chronic
+rehearsal** over a lossless store, because under M2 each recall resets the decay
+clock and grows stability, so a memory rehearsed on a spaced schedule becomes
+permanently retrievable.
+
+Result (`tests/test_hsam.py`, 3/3): under M2, a rehearsed memory's retrievability
+is **age-independent** — a 3-year-old memory scores the same as a fresh one (3y/1h
+ratio = 1.00) — and it takes only **~13 well-timed rehearsals over 3 years**
+(an expanding/spaced schedule), not thousands. The same rehearsal under **M1
+(production)** decays to ~5e-12 at 3 years: because M1's decay is anchored to
+*encoding* and never reset by recall, rehearsal cannot sustain old memories. So
+HSAM-like total recall is reachable under M2 and unreachable under the live rule —
+which both demonstrates the claim and re-confirms the production gap from a second
+angle.
+
+Scope: this mimics the *coverage* (age-independent retrievability), not the
+reconstructive re-living human HSAM subjects describe — and forgetting is adaptive,
+so a non-decaying tier is a deliberate trade, not a free upgrade.
 
 ## The trajectory
 

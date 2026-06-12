@@ -40,9 +40,19 @@ deploy + validation checklist in `soul-svc-port/README.md`. The status line move
 from *aspirational* to *here's the code* only after that real-data demonstration,
 and a failure there is published, not rolled back quietly.
 
+## Benchmark 02 — HSAM via rehearsal (DONE, 2026-06-11)
+Age-independent recall (the HSAM hallmark) is the behavioral limit of M2 + spaced
+rehearsal over a lossless store. `benchmarks/hsam_rehearsal.py` + `tests/test_hsam.py`
+(3/3): M2+rehearsal flat across 3 years (3y/1h ratio = 1.00) with only ~13
+rehearsals; M1+rehearsal collapses to ~5e-12 (creation-anchored decay, never reset).
+Reachable under M2, unreachable under production M1 — a second confirmation of the
+benchmark-01 gap. No production change needed beyond the M2 deploy already staged;
+an optional "HSAM tier" (non-decaying / heavily-rehearsed autobiographical tier)
+is a deliberate trade, not a default (forgetting is adaptive).
+
 ## Backlog — benchmarks to add
-- 02 reconsolidation / prediction-error update window (nonmonotonic mismatch).
-- 03 retrieval-induced / active forgetting.
-- 04 consolidation (tag-then-replay) selectivity vs salience function.
+- 03 reconsolidation / prediction-error update window (nonmonotonic mismatch).
+- 04 retrieval-induced / active forgetting.
+- 05 consolidation (tag-then-replay) selectivity vs salience function.
 Each must obey the standard in `README.md`: declared params, controlled confounds,
 honest negatives.
