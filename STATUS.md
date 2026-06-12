@@ -50,9 +50,22 @@ benchmark-01 gap. No production change needed beyond the M2 deploy already stage
 an optional "HSAM tier" (non-decaying / heavily-rehearsed autobiographical tier)
 is a deliberate trade, not a default (forgetting is adaptive).
 
+## Benchmark 03 — reconsolidation / prediction-error window (DONE, 2026-06-11)
+Located gap: M1 (production) AND the M2 fix have NO in-place belief revision —
+update fraction = 0 across all prediction error. The system can only append
+corrections, never correct a stored memory in place when contradicting evidence
+arrives. `benchmarks/reconsolidation.py` + `tests/test_reconsolidation.py` (3/3).
+M3 (`reference/m3_reconsolidation.py`) is the minimal fix: a prediction-error-gated
+update, nonmonotonic (necessary PE to destabilize; too much PE → new memory). The
+inverted-U is DESIGNED to match known bounds (Sevenster 2013/2014; Sinclair &
+Barense 2019), so the window shape is a consistency check, not a discovery — the
+result is the gap. NOT yet in `soul-svc-port/` (needs a content/embedding PE
+comparison at retrieval); tracked as future work, a distinct change from the M2
+durability deploy.
+
 ## Backlog — benchmarks to add
-- 03 reconsolidation / prediction-error update window (nonmonotonic mismatch).
 - 04 retrieval-induced / active forgetting.
 - 05 consolidation (tag-then-replay) selectivity vs salience function.
+- port: M3 (in-place reconsolidation) into soul-svc — separate, larger change.
 Each must obey the standard in `README.md`: declared params, controlled confounds,
 honest negatives.

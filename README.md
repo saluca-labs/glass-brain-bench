@@ -33,6 +33,7 @@ from looking better than it is.
 |---|------|-------|--------|
 | 01 | `benchmarks/forgetting_spacing.py` | Ebbinghaus forgetting curve + spacing effect | **run** — see finding below |
 | 02 | `benchmarks/hsam_rehearsal.py` | HSAM: age-independent recall via rehearsal | **run** — M2-only, see finding below |
+| 03 | `benchmarks/reconsolidation.py` | reconsolidation: prediction-error update window | **run** — located gap, see finding below |
 
 ### Benchmark 01 finding (2026-06-11)
 
@@ -89,6 +90,28 @@ angle.
 Scope: this mimics the *coverage* (age-independent retrievability), not the
 reconstructive re-living human HSAM subjects describe — and forgetting is adaptive,
 so a non-decaying tier is a deliberate trade, not a free upgrade.
+
+### Benchmark 03 finding (2026-06-11)
+
+Human memory revises a stored belief at retrieval only within a *window* of
+prediction error: none if the reminder matches (nothing to learn), maximal at
+moderate mismatch, and none again if the mismatch is large enough to be treated as
+a new event (Sevenster 2013/2014; Sinclair & Barense 2019).
+
+The honest finding here is **not** "we reproduced the inverted-U" — that curve is
+*designed* into M3 to match those boundary conditions. The finding is the **located
+gap**: SHI today (M1) **and** the M2 durability/spacing fix have **no in-place
+revision at all** (`tests/test_reconsolidation.py`, 3/3 — M1/M2 update fraction = 0
+across the entire PE range). A recall may strengthen a memory (M2) or bump a count
+(M1), but it never moves a stored belief toward contradicting evidence. So the
+system can only *append* corrections, never *correct in place* — stale or wrong
+memories persist. Reconsolidation is a distinct gap from forgetting/spacing, and
+M3 (`reference/m3_reconsolidation.py`) is the minimal mechanism that closes it: a
+prediction-error-gated update, nonmonotonic as biology requires (necessary PE to
+destabilize; too much PE → new memory, old one intact).
+
+This one is **not yet in `soul-svc-port/`** — it is a larger change (it needs a
+content/embedding comparison at retrieval to compute PE), tracked as future work.
 
 ## The trajectory
 
