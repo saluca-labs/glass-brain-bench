@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+# results/ figures are checked in as the published record of each benchmark run
