@@ -73,11 +73,13 @@ This repo exists to move, in public and in order:
 1. **here is the gap** — benchmark 01, done.
 2. **here is the aspirational fix** — M2: gate the corroboration increment on
    retrievability at recall, and let a successful recall reset/extend the decay
-   clock (testing effect). The spacing effect falls out. *Not yet built in
-   production.* See `STATUS.md`.
+   clock (testing effect). The spacing effect falls out. **Reference
+   implementation built and validated** (`reference/m2_memory.py`, `tests/` —
+   3/3 passing); production deploy **staged** in `soul-svc-port/`, *not yet
+   applied*. See `STATUS.md`.
 3. **here is the code that closes it** — the M2 mechanism shipped into the live
-   memory layer, re-run against this benchmark on real data, demonstrated not
-   asserted.
+   memory layer, re-run against this benchmark on **real data**, demonstrated not
+   asserted. Not done.
 
 ## Run
 

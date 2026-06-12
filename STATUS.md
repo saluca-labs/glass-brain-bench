@@ -19,24 +19,26 @@ Consequence: no spacing effect, and a single-timescale decay that cannot match t
 heavy-tailed forgetting curve. Retrieval also does not reinstate the trace (no
 testing effect).
 
-### aspirational fix (NOT BUILT)
-Move the production model M1 → M2:
-1. **Activation-gated corroboration.** Replace the count-only recall boost with a
-   stability gain that depends on retrievability at recall time — larger gain when
-   the memory was nearly forgotten (gain ∝ 1−R, realized with prob ≈ R).
-2. **Recall resets/extends the decay clock.** Anchor decay to `last_recall`, not
-   only `created_at`, and lengthen the half-life on each successful retrieval — the
-   testing effect. Spacing then falls out of (1)+(2) together.
-3. **Per-memory stability is stored and updated**, not recomputed from a count at
-   query time, so the trajectory of a memory's strength is itself inspectable.
+### reference implementation (BUILT + VALIDATED, 2026-06-11)
+M2 is implemented and its behavior demonstrated, not asserted:
+- `reference/m2_memory.py` — the activation-gated, testing-effect model:
+  1. **Activation-gated corroboration** — stability gain ∝ R·(1−R) (max at R=0.5).
+  2. **Recall resets/extends the decay clock** — decay anchored to `last_recall_at`
+     (the testing effect); spacing falls out of (1)+(2) together.
+  3. **Per-memory stability stored and updated**, not recomputed from a count.
+- `tests/test_m2_spacing.py` — **3/3 passing**: M1 shows no spacing (monotonic in
+  gap), M2 shows spacing with an interior optimal lag at gap ≈ H0 (R≈0.5), and a
+  recall resets retrievability to 1.0 while increasing stability.
 
-Open question before shipping: whether (1)+(2) at SHI's scale and access patterns
-actually reproduce the human curves — to be **demonstrated** by re-running
-benchmark 01 against real logs, not assumed.
-
-### shipped code (NOT STARTED)
-M2 implemented in the live memory layer; benchmark 01 re-run on production decay
-traces; results published here next to the simulation.
+### production deploy (STAGED, NOT APPLIED)
+`soul-svc-port/` holds the proposed change against `soul-svc/hybrid_search.py`:
+the migration (`001_add_stability_last_recall.sql`) and the three-point drop-in
+(`hybrid_search_m2.py` — SELECT, Phase-4 scoring factor, recall-event update).
+**Not deployed.** Whether M2 reproduces the human curves at SHI's real scale and
+access patterns is unproven until re-run against production decay traces — see the
+deploy + validation checklist in `soul-svc-port/README.md`. The status line moves
+from *aspirational* to *here's the code* only after that real-data demonstration,
+and a failure there is published, not rolled back quietly.
 
 ## Backlog — benchmarks to add
 - 02 reconsolidation / prediction-error update window (nonmonotonic mismatch).
