@@ -88,5 +88,9 @@ python benchmarks/forgetting_spacing.py     # writes results/forgetting_spacing.
 
 ## License
 
-TODO — choose before public release (the essay's ethos favors an open,
-permissive license so the standard can be adopted freely).
+Apache License 2.0 — Copyright 2026 Saluca Labs, LLC. See `LICENSE` and `NOTICE`.
+
+Apache-2.0 is chosen deliberately over a more minimal license: its explicit
+patent grant lets anyone adopt and build on this testing standard without
+ambiguity about Saluca's patent portfolio. The standard is only useful if it is
+genuinely free to take.
