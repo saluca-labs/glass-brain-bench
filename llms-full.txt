@@ -2,13 +2,15 @@
 
 > Runnable benchmarks that hold synthetic-memory rules to memory-lab standards (declared parameters, controlled confounds, equal parameter counts, published negatives): forgetting and spacing, HSAM via rehearsal, and reconsolidation. Companion to the essay "The Glass Brain" (Saluca, 2026). Apache-2.0.
 
-Facts agents most often get wrong: the default branch is `master`. This is a simulation harness, not a memory library and not evidence about biology; every result is a fact about the simulated rule. M1 is the count-based rule, M2 the activation-gated fix (reference implementation only), M3 the reconsolidation fix; `soul-svc-port/` is a staged proposal for a separate, private service and is not deployed. Python 3.12, numpy, scipy, matplotlib.
+Facts agents most often get wrong: the default branch is `master`. This is a simulation harness, not a memory library and not evidence about biology; every result is a fact about the simulated rule. M1 is the count-based rule, M2 the activation-gated fix (reference implementation only), M3 the reconsolidation fix; `soul-svc-port/` is a staged proposal for a separate, private service and is not deployed. The production code the findings quote (`soul-svc/hybrid_search.py`) is not in this repository. Python 3.12, numpy, scipy, matplotlib.
 
-Generated 2026-10-22 from the files below. Regenerate whenever any of them changes.
+The complete public surface is below. If a command, function or option is not listed here, it does not exist. There is no package, no CLI flags and no network service. Commands: `python benchmarks/forgetting_spacing.py`, `python benchmarks/hsam_rehearsal.py`, `python benchmarks/reconsolidation.py` (no arguments; each prints its numbers and writes one PNG to `results/`), `python -m pytest -v tests`. Python: `reference.m2_memory` (`retrievability`, `stability_after_recall`, `M2Memory` with `retrievability_at` and `recall`, `m1_count_based_score`, `H0_DEFAULT`, `F_DEFAULT`); `reference.m3_reconsolidation` (`destabilization`, `m3_update`, `m1_or_m2_update`, `PE_LOW`, `PE_HIGH`, `D_MAX`); `benchmarks.hsam_rehearsal` (`rehearsal_schedule`, `m2_rehearsed`, `m2_unrehearsed`, `m1_rehearsed`, `m1_unrehearsed`, `main`). `soul-svc-port/hybrid_search_m2.py` (`apply_recall_update` and two private helpers) and `001_add_stability_last_recall.sql` target the private service and are not run here.
+
+The full text of this repository's prose docs, concatenated, each under its path. Regenerate this file whenever one of them changes.
 
 ## README.md
 
-# glass-brain-bench
+### glass-brain-bench
 
 Open testing standards for synthetic-memory claims, companion to the essay
 **"The Glass Brain"** (Saluca, 2026).
@@ -20,7 +22,60 @@ hold them to. This repository is where that standard is enforced in runnable
 code, so the claims can be re-run, attacked, and extended by anyone, rather than
 taken on the author's word.
 
-## Status
+#### How it works
+
+Each benchmark is a script that compares memory rules with the same parameter count, prints its
+numbers and draws one figure into `results/`. Arrows are imports and file writes, read from the
+code. Benchmark 01 carries its own copy of the M1 and M2 equations; benchmarks 02 and 03 import
+the reference models. The tests import either the reference models or benchmark 02 directly.
+
+```mermaid
+flowchart LR
+    subgraph REF["reference/"]
+        M3["m3_reconsolidation.py: destabilization, m3_update, m1_or_m2_update, PE_LOW, PE_HIGH"]
+        M2["m2_memory.py: M2Memory, m1_count_based_score, H0_DEFAULT, F_DEFAULT"]
+    end
+    subgraph BENCH["benchmarks/"]
+        B1["forgetting_spacing.py: Ebbinghaus 1885 points, exp and power-law fits, inline M1 and M2 spacing"]
+        B3["reconsolidation.py: update fraction across prediction error"]
+        B2["hsam_rehearsal.py: rehearsal_schedule, m2_rehearsed, m1_rehearsed"]
+    end
+    subgraph TESTS["tests/"]
+        T3["test_reconsolidation.py"]
+        T1["test_m2_spacing.py"]
+        T2["test_hsam.py"]
+    end
+    subgraph OUT["results/"]
+        P1["forgetting_spacing.png"]
+        P3["reconsolidation.png"]
+        P2["hsam_rehearsal.png"]
+    end
+    M3 -->|import| B3
+    M2 -->|import| B2
+    M3 -->|import| T3
+    M2 -->|import| T1
+    B2 -->|import| T2
+    B1 -->|writes| P1
+    B3 -->|writes| P3
+    B2 -->|writes| P2
+```
+
+`soul-svc-port/` imports nothing from this repo. It is a staged change written against a separate,
+private service; see [What is in this repo](#what-is-in-this-repo).
+
+#### What is in this repo
+
+| Layer | In this repo | Licence | Where it lives |
+|---|---|---|---|
+| Benchmarks 01 to 03, reference models M2 and M3, tests, figures | yes | Apache-2.0 | `benchmarks/`, `reference/`, `tests/`, `results/` |
+| Proposed M2 change for production (SQL migration, scoring drop-in) | yes, staged, not deployed | Apache-2.0 | `soul-svc-port/` |
+| The production memory service the findings describe (`soul-svc/hybrid_search.py`, M1) | no | not public | a private Saluca repository; quoted in this README and `STATUS.md` from a reading of its code |
+| The essay "The Glass Brain" | no | not recorded | no public link recorded yet |
+
+An agent can run and check everything in the first two rows. Claims about the production service
+cannot be checked from this repository.
+
+#### Status
 
 Research artifact. All three benchmarks and their nine tests run from a clean clone and reproduce
 the numbers quoted below (re-run 2026-10-22). Each benchmark is a simulation of a rule, not a
@@ -28,7 +83,7 @@ measurement of a deployed system: the M2 fix is validated in `reference/` and `t
 proposed production change in `soul-svc-port/` is staged, not applied, as of the last update to
 [`STATUS.md`](STATUS.md). Benchmarks 04 and 05 are backlog, not built.
 
-## Install
+#### Install
 
 Tested 2026-10-22 on Python 3.12.10 with numpy 2.5.4, scipy 1.18.1, matplotlib 3.11.2 (CI uses
 Python 3.12).
@@ -40,7 +95,7 @@ python -m venv .venv && . .venv/bin/activate      # Windows: .venv\Scripts\activ
 pip install -r requirements.txt pytest
 ```
 
-## Quickstart
+#### Quickstart
 
 ```bash
 python benchmarks/forgetting_spacing.py     # writes results/forgetting_spacing.png
@@ -58,7 +113,7 @@ M2 activation-gated: optimal gap=48.1 h (=H0), peak/massed=1.587x, improvement=+
 A last line, `saved: <your clone>/results/forgetting_spacing.png`, prints the absolute path of the
 figure; it is left out here because it shows the local directory.
 
-## Usage
+#### Usage
 
 ```bash
 python -m pytest -v tests                    # 9 tests, 3 per benchmark
@@ -74,7 +129,7 @@ On 2026-10-22 the tests reported `9 passed`. Benchmark 02 printed, among its lin
 benchmark overwrites its figure in `results/`, which is checked in as the published record; do not
 commit a regenerated figure unless the benchmark itself changed.
 
-## The standard
+#### The standard
 
 Every benchmark here obeys the same rules. They exist to stop a memory model
 from looking better than it is.
@@ -91,7 +146,7 @@ from looking better than it is.
 5. **No borrowed credibility.** A result inside a simulated artifact is a fact
    about the artifact, never evidence about biology, until a wet lab confirms it.
 
-## Benchmarks
+#### Benchmarks
 
 | # | file | tests | status |
 |---|------|-------|--------|
@@ -99,7 +154,7 @@ from looking better than it is.
 | 02 | `benchmarks/hsam_rehearsal.py` | HSAM: age-independent recall via rehearsal | **run**, M2-only, see finding below |
 | 03 | `benchmarks/reconsolidation.py` | reconsolidation: prediction-error update window | **run**, located gap, see finding below |
 
-### Benchmark 01 finding (2026-06-11)
+##### Benchmark 01 finding (2026-06-11)
 
 Two models, same two parameters, differing only in the update rule:
 
@@ -132,7 +187,7 @@ curve. The benchmark located a real, confirmed gap in the artifact.
 > ("persistence is a function of corroboration") is, in code, literally a function
 > of corroboration *count*, and that rule does not reproduce these phenomena.
 
-### Benchmark 02 finding (2026-06-11)
+##### Benchmark 02 finding (2026-06-11)
 
 Motivated by the 60 Minutes "Endless Memory" segment on HSAM (people who recall
 essentially every day of their life, *age-independently*). The claim under test:
@@ -155,7 +210,7 @@ Scope: this mimics the *coverage* (age-independent retrievability), not the
 reconstructive re-living human HSAM subjects describe, and forgetting is adaptive,
 so a non-decaying tier is a deliberate trade, not a free upgrade.
 
-### Benchmark 03 finding (2026-06-11)
+##### Benchmark 03 finding (2026-06-11)
 
 Human memory revises a stored belief at retrieval only within a *window* of
 prediction error: none if the reminder matches (nothing to learn), maximal at
@@ -177,7 +232,7 @@ destabilize; too much PE → new memory, old one intact).
 This one is **not yet in `soul-svc-port/`**; it is a larger change (it needs a
 content/embedding comparison at retrieval to compute PE), tracked as future work.
 
-## The trajectory
+#### The trajectory
 
 This repo exists to move, in public and in order:
 
@@ -192,7 +247,7 @@ This repo exists to move, in public and in order:
    memory layer, re-run against this benchmark on **real data**, demonstrated not
    asserted. Not done.
 
-## Architecture
+#### Architecture
 
 | Path | What it holds |
 |---|---|
@@ -208,7 +263,7 @@ Each benchmark compares models with the same parameter count that differ only in
 (M1 count-based, M2 activation-gated, M3 reconsolidation), so a difference in the output is
 attributable to that mechanism.
 
-## Screenshots
+#### Screenshots
 
 The figures each benchmark writes. Re-generated from a clean clone on 2026-10-22, they match the
 checked-in copies below (font rendering aside).
@@ -219,11 +274,11 @@ checked-in copies below (font rendering aside).
 
 ![Benchmark 03: the M3 update fraction is an inverted U over prediction error between PE_low 0.1 and PE_high 0.85, while M1 and M2 stay at zero across the whole range](results/reconsolidation.png)
 
-## Citation
+#### Citation
 
 No archived record yet.
 
-## License
+#### License
 
 Apache License 2.0 (SPDX: `Apache-2.0`), Copyright 2026 Saluca Labs, LLC. See [`LICENSE`](LICENSE)
 and [`NOTICE`](NOTICE).
@@ -233,7 +288,7 @@ patent grant lets anyone adopt and build on this testing standard without
 ambiguity about Saluca's patent portfolio. The standard is only useful if it is
 genuinely free to take.
 
-## Links
+#### Links
 
 - [`STATUS.md`](STATUS.md): the status of each claim and the backlog
 - [`soul-svc-port/README.md`](soul-svc-port/README.md): the deploy and validation checklist for M2
@@ -243,13 +298,13 @@ _Last updated: 2026-10-22_
 
 ## STATUS.md
 
-# STATUS
+### STATUS
 
 Where each claim sits on the gap → aspirational fix → shipped code trajectory.
 
-## Benchmark 01: forgetting curve + spacing
+#### Benchmark 01: forgetting curve + spacing
 
-### gap (DONE, 2026-06-11)
+##### gap (DONE, 2026-06-11)
 SHI production memory (`soul-svc/hybrid_search.py`) is M1 (count-based). Confirmed
 by reading the code, not just by simulation:
 - `DECAY_LAMBDA = 0.001` /hr → single fixed half-life ~693 h (~29 d), decay measured
@@ -264,7 +319,7 @@ Consequence: no spacing effect, and a single-timescale decay that cannot match t
 heavy-tailed forgetting curve. Retrieval also does not reinstate the trace (no
 testing effect).
 
-### reference implementation (BUILT + VALIDATED, 2026-06-11)
+##### reference implementation (BUILT + VALIDATED, 2026-06-11)
 M2 is implemented and its behavior demonstrated, not asserted:
 - `reference/m2_memory.py`: the activation-gated, testing-effect model:
   1. **Activation-gated corroboration**: stability gain ∝ R·(1−R) (max at R=0.5).
@@ -275,7 +330,7 @@ M2 is implemented and its behavior demonstrated, not asserted:
   gap), M2 shows spacing with an interior optimal lag at gap ≈ H0 (R≈0.5), and a
   recall resets retrievability to 1.0 while increasing stability.
 
-### production deploy (STAGED, NOT APPLIED)
+##### production deploy (STAGED, NOT APPLIED)
 `soul-svc-port/` holds the proposed change against `soul-svc/hybrid_search.py`:
 the migration (`001_add_stability_last_recall.sql`) and the three-point drop-in
 (`hybrid_search_m2.py`: SELECT, Phase-4 scoring factor, recall-event update).
@@ -285,7 +340,7 @@ deploy + validation checklist in `soul-svc-port/README.md`. The status line move
 from *aspirational* to *here's the code* only after that real-data demonstration,
 and a failure there is published, not rolled back quietly.
 
-## Benchmark 02: HSAM via rehearsal (DONE, 2026-06-11)
+#### Benchmark 02: HSAM via rehearsal (DONE, 2026-06-11)
 Age-independent recall (the HSAM hallmark) is the behavioral limit of M2 + spaced
 rehearsal over a lossless store. `benchmarks/hsam_rehearsal.py` + `tests/test_hsam.py`
 (3/3): M2+rehearsal flat across 3 years (3y/1h ratio = 1.00) with only ~13
@@ -295,7 +350,7 @@ benchmark-01 gap. No production change needed beyond the M2 deploy already stage
 an optional "HSAM tier" (non-decaying / heavily-rehearsed autobiographical tier)
 is a deliberate trade, not a default (forgetting is adaptive).
 
-## Benchmark 03: reconsolidation / prediction-error window (DONE, 2026-06-11)
+#### Benchmark 03: reconsolidation / prediction-error window (DONE, 2026-06-11)
 Located gap: M1 (production) AND the M2 fix have NO in-place belief revision,
 update fraction = 0 across all prediction error. The system can only append
 corrections, never correct a stored memory in place when contradicting evidence
@@ -308,7 +363,7 @@ result is the gap. NOT yet in `soul-svc-port/` (needs a content/embedding PE
 comparison at retrieval); tracked as future work, a distinct change from the M2
 durability deploy.
 
-## Backlog: benchmarks to add
+#### Backlog: benchmarks to add
 - 04 retrieval-induced / active forgetting.
 - 05 consolidation (tag-then-replay) selectivity vs salience function.
 - port: M3 (in-place reconsolidation) into soul-svc, separate, larger change.
@@ -317,7 +372,7 @@ honest negatives.
 
 ## soul-svc-port/README.md
 
-# soul-svc-port: the M2 fix, staged for production
+### soul-svc-port: the M2 fix, staged for production
 
 This directory is the **proposed** production change that moves SHI's live memory
 layer from M1 (count-based, no spacing) to M2 (activation-gated, testing-effect).
@@ -325,13 +380,13 @@ It is **not deployed**. The mechanism is validated in `../tests/test_m2_spacing.
 deployment to the live `_memories` table and re-validation on real decay traces is
 the remaining step (the repo's "shipped code" milestone, see `../STATUS.md`).
 
-## Files
+#### Files
 - `001_add_stability_last_recall.sql`: schema migration (adds `stability`,
   `last_recall_at`; seeds + backfills, non-destructively).
 - `hybrid_search_m2.py`: the three changes against `soul-svc/hybrid_search.py`:
   the `SELECT`, the Phase-4 scoring factor, and the recall-event update spec.
 
-## Why this is staged, not hot-applied
+#### Why this is staged, not hot-applied
 The integrity standard this whole project runs on is *demonstrate, don't assert*.
 M2 is demonstrated in simulation (the test passes), but **whether it reproduces
 the human curves at SHI's real scale and access patterns has not been shown**,
@@ -339,7 +394,7 @@ that requires running it against production logs, which is exactly the claim we
 refuse to assert in advance. Hot-editing the live memory the assistant depends on,
 and declaring victory, would be the failure mode the essay is about.
 
-## Deploy + validation checklist (the path to "here's the code")
+#### Deploy + validation checklist (the path to "here's the code")
 1. Apply `001_*.sql` on **staging**; confirm backfill preserves current ranking
    within tolerance on a sample of queries.
 2. Wire the three changes from `hybrid_search_m2.py`; put the new retrievability
@@ -353,7 +408,97 @@ and declaring victory, would be the failure mode the essay is about.
    line move from *aspirational* to *here's the code*. If it does not, that is a
    published negative, not a quiet rollback.
 
-## Parameters
+#### Parameters
 `H0 = 48 h` (initial half-life), `F = 3.0` (max corroboration factor). These are
 placeholders carried over from the benchmark; before production they must be
 re-derived against real retention data, with the fit reported.
+
+## AGENTS.md
+
+### AGENTS.md
+
+Instructions for AI coding agents working in this repository.
+
+#### What this is
+
+Three runnable benchmarks that hold synthetic-memory update rules to memory-lab standards, with
+reference models for the proposed fixes. It is a simulation harness: every result is a fact about a
+simulated rule, not about biology and not a measurement of a deployed system.
+
+#### Read in this order
+
+1. `README.md`: the standard, the "How it works" diagram, what is in this repo and what is not, and
+   the three findings.
+2. `STATUS.md`: where each claim sits (gap, reference fix, shipped code) and the backlog.
+3. `reference/m2_memory.py` and `reference/m3_reconsolidation.py`: the M2 and M3 models.
+4. `benchmarks/`: the three benchmark scripts; `tests/` holds 3 tests per benchmark.
+5. `soul-svc-port/README.md`: the staged, undeployed production change for M2.
+
+#### What you can and cannot see
+
+- You can run and check everything in `benchmarks/`, `reference/`, `tests/` and `soul-svc-port/`.
+- The production memory service the findings describe (`soul-svc/hybrid_search.py`, the M1 rule)
+  is in a private repository. Its code is quoted in README.md and STATUS.md; you cannot check
+  those quotes from here.
+- `soul-svc-port/` is written against that private service. Nothing in this repo imports it and
+  no test covers it.
+- `benchmarks/forgetting_spacing.py` has its own inline copy of the M1 and M2 equations; it does
+  not import `reference/m2_memory.py`. `tests/test_m2_spacing.py` tests the reference model.
+
+#### The only numbers to trust
+
+- Declared parameters: `H0_DEFAULT` and `F_DEFAULT` in `reference/m2_memory.py`; `H0`, `F` and `RI`
+  in `benchmarks/forgetting_spacing.py`; `PE_LOW`, `PE_HIGH` and `D_MAX` in
+  `reference/m3_reconsolidation.py`; `LAMBDA` and `TARGET_R` in `benchmarks/hsam_rehearsal.py`.
+- Benchmark results: what a fresh run of each script prints. The README quotes the 2026-10-22 run;
+  the checked-in figures in `results/` are the published record of each benchmark.
+- Test count: `python -m pytest -v tests` (9 on 2026-10-22).
+
+#### Quickstart
+
+```bash
+python benchmarks/forgetting_spacing.py     # prints the fits and the spacing result
+```
+
+#### Setup
+
+```bash
+python -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt pytest
+```
+
+#### Test
+
+```bash
+python -m pytest -v tests
+```
+
+Passing looks like `9 passed` (3 per benchmark on 2026-10-22). CI (`.github/workflows/tests.yml`)
+runs the same command on Python 3.12.
+
+#### Conventions
+
+- Every benchmark obeys the standard in README.md: parameter count declared before looking at the
+  human data, confounds controlled by design, the same parameter count across compared models, and
+  failures published as results.
+- A new benchmark comes with tests that would fail if the claimed effect were absent.
+- Dependencies stay numpy, scipy, matplotlib (and pytest for tests).
+- If an import between `reference/`, `benchmarks/` and `tests/` changes, update the README diagram
+  in the same change.
+- No em-dashes in docs. If README.md, STATUS.md or soul-svc-port/README.md changes, regenerate
+  `llms-full.txt` in the same change.
+
+#### Do not
+
+- Commit a regenerated figure in `results/` unless the benchmark that draws it changed. The figures
+  are the published record of each run.
+- Tune a parameter after looking at the human data, or describe a simulated result as a finding
+  about biology or about a deployed system.
+- Describe `soul-svc-port/` as deployed. It is staged until STATUS.md says otherwise.
+- Commit secrets, hostnames, internal paths or personal emails. The benchmarks print an absolute
+  output path; never paste that line into docs.
+
+#### Done means
+
+`python -m pytest -v tests` passes, each changed benchmark runs and prints its numbers, and any
+number quoted in README.md or STATUS.md matches a fresh run.

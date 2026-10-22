@@ -10,6 +10,59 @@ hold them to. This repository is where that standard is enforced in runnable
 code, so the claims can be re-run, attacked, and extended by anyone, rather than
 taken on the author's word.
 
+## How it works
+
+Each benchmark is a script that compares memory rules with the same parameter count, prints its
+numbers and draws one figure into `results/`. Arrows are imports and file writes, read from the
+code. Benchmark 01 carries its own copy of the M1 and M2 equations; benchmarks 02 and 03 import
+the reference models. The tests import either the reference models or benchmark 02 directly.
+
+```mermaid
+flowchart LR
+    subgraph REF["reference/"]
+        M3["m3_reconsolidation.py: destabilization, m3_update, m1_or_m2_update, PE_LOW, PE_HIGH"]
+        M2["m2_memory.py: M2Memory, m1_count_based_score, H0_DEFAULT, F_DEFAULT"]
+    end
+    subgraph BENCH["benchmarks/"]
+        B1["forgetting_spacing.py: Ebbinghaus 1885 points, exp and power-law fits, inline M1 and M2 spacing"]
+        B3["reconsolidation.py: update fraction across prediction error"]
+        B2["hsam_rehearsal.py: rehearsal_schedule, m2_rehearsed, m1_rehearsed"]
+    end
+    subgraph TESTS["tests/"]
+        T3["test_reconsolidation.py"]
+        T1["test_m2_spacing.py"]
+        T2["test_hsam.py"]
+    end
+    subgraph OUT["results/"]
+        P1["forgetting_spacing.png"]
+        P3["reconsolidation.png"]
+        P2["hsam_rehearsal.png"]
+    end
+    M3 -->|import| B3
+    M2 -->|import| B2
+    M3 -->|import| T3
+    M2 -->|import| T1
+    B2 -->|import| T2
+    B1 -->|writes| P1
+    B3 -->|writes| P3
+    B2 -->|writes| P2
+```
+
+`soul-svc-port/` imports nothing from this repo. It is a staged change written against a separate,
+private service; see [What is in this repo](#what-is-in-this-repo).
+
+## What is in this repo
+
+| Layer | In this repo | Licence | Where it lives |
+|---|---|---|---|
+| Benchmarks 01 to 03, reference models M2 and M3, tests, figures | yes | Apache-2.0 | `benchmarks/`, `reference/`, `tests/`, `results/` |
+| Proposed M2 change for production (SQL migration, scoring drop-in) | yes, staged, not deployed | Apache-2.0 | `soul-svc-port/` |
+| The production memory service the findings describe (`soul-svc/hybrid_search.py`, M1) | no | not public | a private Saluca repository; quoted in this README and `STATUS.md` from a reading of its code |
+| The essay "The Glass Brain" | no | not recorded | no public link recorded yet |
+
+An agent can run and check everything in the first two rows. Claims about the production service
+cannot be checked from this repository.
+
 ## Status
 
 Research artifact. All three benchmarks and their nine tests run from a clean clone and reproduce
