@@ -1,4 +1,4 @@
-# soul-svc-port — the M2 fix, staged for production
+# soul-svc-port: the M2 fix, staged for production
 
 This directory is the **proposed** production change that moves SHI's live memory
 layer from M1 (count-based, no spacing) to M2 (activation-gated, testing-effect).
@@ -7,15 +7,15 @@ deployment to the live `_memories` table and re-validation on real decay traces 
 the remaining step (the repo's "shipped code" milestone, see `../STATUS.md`).
 
 ## Files
-- `001_add_stability_last_recall.sql` — schema migration (adds `stability`,
+- `001_add_stability_last_recall.sql`: schema migration (adds `stability`,
   `last_recall_at`; seeds + backfills, non-destructively).
-- `hybrid_search_m2.py` — the three changes against `soul-svc/hybrid_search.py`:
+- `hybrid_search_m2.py`: the three changes against `soul-svc/hybrid_search.py`:
   the `SELECT`, the Phase-4 scoring factor, and the recall-event update spec.
 
 ## Why this is staged, not hot-applied
 The integrity standard this whole project runs on is *demonstrate, don't assert*.
 M2 is demonstrated in simulation (the test passes), but **whether it reproduces
-the human curves at SHI's real scale and access patterns has not been shown** —
+the human curves at SHI's real scale and access patterns has not been shown**,
 that requires running it against production logs, which is exactly the claim we
 refuse to assert in advance. Hot-editing the live memory the assistant depends on,
 and declaring victory, would be the failure mode the essay is about.

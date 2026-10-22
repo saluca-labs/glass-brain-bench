@@ -1,0 +1,26 @@
+# glass-brain-bench
+
+> Runnable benchmarks that hold synthetic-memory rules to memory-lab standards (declared parameters, controlled confounds, equal parameter counts, published negatives): forgetting and spacing, HSAM via rehearsal, and reconsolidation. Companion to the essay "The Glass Brain" (Saluca, 2026). Apache-2.0.
+
+Facts agents most often get wrong: the default branch is `master`. This is a simulation harness, not a memory library and not evidence about biology; every result is a fact about the simulated rule. M1 is the count-based rule, M2 the activation-gated fix (reference implementation only), M3 the reconsolidation fix; `soul-svc-port/` is a staged proposal for a separate, private service and is not deployed. Python 3.12, numpy, scipy, matplotlib.
+
+## Docs
+
+- [README](https://github.com/saluca-labs/glass-brain-bench/blob/master/README.md): install, quickstart, the standard, the three findings
+- [STATUS.md](https://github.com/saluca-labs/glass-brain-bench/blob/master/STATUS.md): where each claim sits (gap, reference fix, shipped code) and the backlog
+- [soul-svc-port/README.md](https://github.com/saluca-labs/glass-brain-bench/blob/master/soul-svc-port/README.md): the M2 deploy and validation checklist
+
+## Code
+
+- [benchmarks/forgetting_spacing.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/benchmarks/forgetting_spacing.py): benchmark 01, forgetting curve and spacing effect
+- [benchmarks/hsam_rehearsal.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/benchmarks/hsam_rehearsal.py): benchmark 02, age-independent recall via rehearsal
+- [benchmarks/reconsolidation.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/benchmarks/reconsolidation.py): benchmark 03, prediction-error update window
+- [reference/m2_memory.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/reference/m2_memory.py): M2 reference model
+- [reference/m3_reconsolidation.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/reference/m3_reconsolidation.py): M3 reference model
+- [tests/](https://github.com/saluca-labs/glass-brain-bench/blob/master/tests): pytest suite, 3 tests per benchmark
+
+## Optional
+
+- [results/](https://github.com/saluca-labs/glass-brain-bench/blob/master/results): the published figures
+- [soul-svc-port/hybrid_search_m2.py](https://github.com/saluca-labs/glass-brain-bench/blob/master/soul-svc-port/hybrid_search_m2.py): the staged scoring change
+- [llms-full.txt](https://github.com/saluca-labs/glass-brain-bench/blob/master/llms-full.txt): README, STATUS.md and soul-svc-port/README.md concatenated
