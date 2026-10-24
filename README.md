@@ -1,3 +1,5 @@
+![glass-brain-bench](docs/img/banner-2026-10-23.jpg)
+
 # glass-brain-bench
 
 Open testing standards for synthetic-memory claims, companion to the essay
